@@ -7,21 +7,49 @@
 
   <style>
     /* =====================
-       1. 基础样式 - 跟随Notion主题
+       1. 主题变量（默认 glass）
        ===================== */
-    * {
-      box-sizing: border-box;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      margin: 0;
-      padding: 0;
+    :root {
+      --bg: transparent;
+      --card-bg: transparent;
+      --text: #111;
+      --muted: #777;
+      --accent: #00a884;
     }
 
+    body.theme-dark {
+      --bg: transparent;
+      --card-bg: transparent;
+      --text: #f5f6f7;
+      --muted: #9aa0a6;
+      --accent: #00d0a3;
+    }
+
+    body.theme-light {
+      --bg: transparent;
+      --card-bg: transparent;
+      --text: #111;
+      --muted: #666;
+      --accent: #00a884;
+    }
+
+    body.theme-glass {
+      --bg: transparent;
+      --card-bg: rgba(255,255,255,0.06);
+      --text: #f5f6f7;
+      --muted: #b0b6bb;
+      --accent: #00d0a3;
+    }
+
+    /* =====================
+       2. 基础布局
+       ===================== */
+    * { box-sizing: border-box; }
     html, body {
-      background: transparent !important;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
-      height: 100%;
-      width: 100%;
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto;
     }
 
     body {
@@ -29,74 +57,38 @@
       justify-content: center;
       align-items: center;
       padding: 12px;
-      background: transparent !important;
     }
 
-    /* =====================
-       2. 组件容器 - 自动适应Notion主题
-       ===================== */
     .widget {
       width: 100%;
-      max-width: 280px;
-      padding: 16px 18px;
-      border-radius: 8px;
-      transition: all 0.2s ease;
-      
-      /* 浅色主题默认样式 */
-      background: #ffffff;
-      color: #191711;
-      border: 1px solid rgba(25, 23, 17, 0.1);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      max-width: 320px;
+      padding: 20px;
+      border-radius: 14px;
+      background: var(--card-bg);
+      color: var(--text);
+      backdrop-filter: blur(10px);
     }
 
     /* =====================
-       3. 深色主题适配
-       通过Notion传递的theme参数自动应用
-       ===================== */
-    body.dark .widget {
-      background: #2d2d2d;
-      color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    }
-
-    /* =====================
-       4. 时间显示
+       3. 时间显示
        ===================== */
     .date {
       text-align: center;
       font-size: 12px;
-      margin-bottom: 4px;
-      font-weight: 500;
-      letter-spacing: 0.2px;
-      
-      /* 浅色主题 */
-      color: #666666;
-    }
-
-    body.dark .date {
-      color: #b4b4b4;
+      color: var(--muted);
+      margin-bottom: 8px;
     }
 
     .time {
       text-align: center;
-      font-size: 30px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      margin-bottom: 20px;
-      font-variant-numeric: tabular-nums;
-      line-height: 1.1;
-      
-      /* 浅色主题 */
-      color: #191711;
-    }
-
-    body.dark .time {
-      color: #ffffff;
+      font-size: 44px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 18px;
     }
 
     /* =====================
-       5. 进度条
+       4. 进度条
        ===================== */
     .row {
       display: flex;
@@ -106,115 +98,45 @@
     }
 
     .label {
-      width: 50px;
-      font-size: 10px;
+      width: 56px;
+      font-size: 12px;
+      color: var(--muted);
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      
-      /* 浅色主题 */
-      color: #666666;
-    }
-
-    body.dark .label {
-      color: #b4b4b4;
-    }
-
-    .bar-container {
-      flex: 1;
-      height: 4px;
-      border-radius: 2px;
-      overflow: hidden;
-      position: relative;
-      
-      /* 浅色主题 */
-      background: rgba(25, 23, 17, 0.08);
-    }
-
-    body.dark .bar-container {
-      background: rgba(255, 255, 255, 0.1);
     }
 
     .bar {
+      flex: 1;
+      height: 8px;
+      background: rgba(127,127,127,0.2);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar > span {
       display: block;
       height: 100%;
       width: 0%;
-      border-radius: 2px;
-      transition: width 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
-      
-      /* 浅色主题 - 使用Notion蓝色 */
-      background: #0d99ff;
-    }
-
-    body.dark .bar {
-      background: #4dabf7;
+      background: linear-gradient(90deg,var(--accent),#00c2ff);
+      border-radius: 999px;
+      transition: width .6s ease;
     }
 
     .percent {
-      width: 32px;
-      font-size: 11px;
+      width: 42px;
+      font-size: 12px;
       text-align: right;
+      color: var(--muted);
       font-weight: 600;
-      font-variant-numeric: tabular-nums;
-      
-      /* 浅色主题 */
-      color: #191711;
-    }
-
-    body.dark .percent {
-      color: #ffffff;
     }
 
     /* =====================
-       6. 底部信息
+       5. 底部
        ===================== */
     .footer {
       text-align: center;
-      margin-top: 16px;
-      padding-top: 12px;
-      font-size: 10px;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: 0.3px;
-      
-      /* 浅色主题 */
-      color: #666666;
-      border-top: 1px solid rgba(25, 23, 17, 0.1);
-    }
-
-    body.dark .footer {
-      color: #b4b4b4;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    /* =====================
-       7. 响应式调整
-       ===================== */
-    @media (max-width: 350px) {
-      .widget {
-        padding: 14px 16px;
-        max-width: 260px;
-      }
-      
-      .time {
-        font-size: 26px;
-        margin-bottom: 18px;
-      }
-      
-      .date {
-        font-size: 11px;
-      }
-    }
-
-    /* =====================
-       8. 动画效果
-       ===================== */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .widget {
-      animation: fadeIn 0.3s ease-out;
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
     }
   </style>
 </head>
@@ -225,26 +147,20 @@
     <div class="time" id="timeText">--:--:--</div>
 
     <div class="row">
-      <div class="label">Year</div>
-      <div class="bar-container">
-        <div class="bar" id="yearBar"></div>
-      </div>
+      <div class="label">YEAR</div>
+      <div class="bar"><span id="yearBar"></span></div>
       <div class="percent" id="yearPct">--%</div>
     </div>
 
     <div class="row">
-      <div class="label">Month</div>
-      <div class="bar-container">
-        <div class="bar" id="monthBar"></div>
-      </div>
+      <div class="label">MONTH</div>
+      <div class="bar"><span id="monthBar"></span></div>
       <div class="percent" id="monthPct">--%</div>
     </div>
 
     <div class="row">
-      <div class="label">Week</div>
-      <div class="bar-container">
-        <div class="bar" id="weekBar"></div>
-      </div>
+      <div class="label">WEEK</div>
+      <div class="bar"><span id="weekBar"></span></div>
       <div class="percent" id="weekPct">--%</div>
     </div>
 
@@ -253,100 +169,58 @@
 
   <script>
     /* =====================
-       1. 主题检测与设置
+       1. 主题参数（核心）
        ===================== */
-    // 获取URL中的主题参数
     const params = new URLSearchParams(location.search)
-    const themeParam = params.get('theme')
-    
-    // 如果URL中指定了主题，使用指定主题
-    // 否则，默认使用浅色主题
-    if (themeParam === 'dark') {
-      document.body.classList.add('dark')
-    } else if (themeParam === 'light') {
-      document.body.classList.remove('dark')
-    } else {
-      // 如果没有指定主题，默认使用浅色
-      document.body.classList.remove('dark')
-    }
+    const theme = params.get('theme') || 'glass'
+    document.body.classList.add(`theme-${theme}`)
 
     /* =====================
        2. 时间逻辑
        ===================== */
-    const pad = n => String(n).padStart(2, '0')
-    const weekCN = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+    const pad = n => String(n).padStart(2,'0')
+    const weekCN = ['周日','周一','周二','周三','周四','周五','周六']
 
-    function dayOfYear(d) {
-      const start = new Date(d.getFullYear(), 0, 0)
-      const diff = d - start
-      const oneDay = 1000 * 60 * 60 * 24
-      return Math.floor(diff / oneDay)
+    function dayOfYear(d){
+      const start = new Date(d.getFullYear(),0,0)
+      return Math.floor((d-start)/(1000*60*60*24))
     }
 
-    function getDaysInMonth(year, month) {
-      return new Date(year, month + 1, 0).getDate()
-    }
-
-    function getWeekNumber(d) {
-      // 创建一个新的日期对象
-      const target = new Date(d.getTime())
-      // 设置为一周的开始（ISO周从周一开始）
-      const dayNr = (target.getDay() + 6) % 7
-      target.setDate(target.getDate() - dayNr + 3)
-      
-      const firstThursday = new Date(target.getFullYear(), 0, 4)
-      const dayDiff = (target - firstThursday) / 86400000
-      
-      return 1 + Math.ceil(dayDiff / 7)
-    }
-
-    function update() {
+    function update(){
       const now = new Date()
 
-      // 更新时间显示
+      // 时间
       document.getElementById('timeText').textContent =
         `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`
 
       document.getElementById('dateText').textContent =
-        `${now.getFullYear()}/${pad(now.getMonth() + 1)}/${pad(now.getDate())} ${weekCN[now.getDay()]}`
+        `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${weekCN[now.getDay()]}`
 
-      // 年进度
-      const isLeapYear = (now.getFullYear() % 4 === 0) && 
-                        (now.getFullYear() % 100 !== 0 || now.getFullYear() % 400 === 0)
-      const yearDays = isLeapYear ? 366 : 365
+      // 年
+      const yearDays = ((now.getFullYear()%4===0)&& (now.getFullYear()%100!==0)) ? 366 : 365
       const y = dayOfYear(now)
-      const yp = Math.round((y / yearDays) * 100)
-      document.getElementById('yearBar').style.width = yp + '%'
-      document.getElementById('yearPct').textContent = yp + '%'
+      const yp = Math.round(y / yearDays * 100)
+      yearBar.style.width = yp + '%'
+      yearPct.textContent = yp + '%'
 
-      // 月进度
-      const mDays = getDaysInMonth(now.getFullYear(), now.getMonth())
-      const mp = Math.round((now.getDate() / mDays) * 100)
-      document.getElementById('monthBar').style.width = mp + '%'
-      document.getElementById('monthPct').textContent = mp + '%'
+      // 月
+      const mDays = new Date(now.getFullYear(),now.getMonth()+1,0).getDate()
+      const mp = Math.round(now.getDate()/mDays*100)
+      monthBar.style.width = mp + '%'
+      monthPct.textContent = mp + '%'
 
-      // 周进度（周一开始）
+      // 周（周一开始）
       const wd = now.getDay() === 0 ? 7 : now.getDay()
-      const wp = Math.round((wd / 7) * 100)
-      document.getElementById('weekBar').style.width = wp + '%'
-      document.getElementById('weekPct').textContent = wp + '%'
+      const wp = Math.round(wd/7*100)
+      weekBar.style.width = wp + '%'
+      weekPct.textContent = wp + '%'
 
-      // 底部信息
-      const weekNum = getWeekNumber(now)
       document.getElementById('footerText').textContent =
-        `Year ${y}/${yearDays} · Month ${now.getDate()}/${mDays} · Week ${weekNum}`
+        `${y}/${yearDays} · ${now.getDate()}/${mDays} · ${wd}/7`
     }
 
-    // 初始化和定时更新
     update()
-    setInterval(update, 1000)
-
-    // 页面可见性优化
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) {
-        update()
-      }
-    })
+    setInterval(update,1000)
   </script>
 </body>
 </html>
