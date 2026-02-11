@@ -7,19 +7,20 @@
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
     <style>
         :root {
-            /* Notion 官方色值定义 (与时间组件保持完全一致) */
+            /* Notion 官方色值定义 */
             --bg-light: #ffffff;
             --bg-dark: #191919;
             --text-light: #373530;
             --text-dark: #ffffff;
             --sub-light: #787774;
             --sub-dark: #9b9b9b;
-            --card-bg-light: #f7f7f5; /* 浅色模式下的卡片背景 */
-            --card-bg-dark: #2c2c2c;  /* 深色模式下的卡片背景 */
+            --card-bg-light: #f7f7f5; 
+            --card-bg-dark: #2c2c2c;
             
-            /* 品牌色：Notion Green */
-            --brand-color: #2eaadc; /* 默认蓝色，打卡后变绿 */
+            /* 品牌色 */
+            --brand-color: #2eaadc; 
             --success-color: #30D158; 
+            --danger-color: #ff4d4f; /* 新增：用于取消操作的暗示色 */
             
             /* 默认变量 */
             --bg-color: var(--bg-light);
@@ -35,7 +36,7 @@
             margin: 0;
             display: flex;
             justify-content: center;
-            align-items: center; /* 垂直居中 */
+            align-items: center; 
             height: 100vh;
             background-color: var(--bg-color);
             color: var(--text-main);
@@ -43,7 +44,6 @@
             overflow: hidden;
         }
 
-        /* 深色模式适配类 */
         body.dark-mode {
             --bg-color: var(--bg-dark);
             --text-main: var(--text-dark);
@@ -62,160 +62,109 @@
             gap: 20px;
         }
 
-        /* --- 1. 头部：等级与称号 (Gamification) --- */
+        /* --- 1. 头部 --- */
         .header-section {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         
-        .user-level {
-            display: flex;
-            flex-direction: column;
-        }
+        .user-level { display: flex; flex-direction: column; }
         
         .level-badge {
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--brand-color);
-            margin-bottom: 2px;
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.05em; color: var(--brand-color); margin-bottom: 2px;
         }
 
-        .level-title {
-            font-size: 20px;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-        }
+        .level-title { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
 
         .current-date {
-            font-size: 12px;
-            color: var(--text-sub);
-            font-weight: 500;
-            text-align: right;
+            font-size: 12px; color: var(--text-sub); font-weight: 500; text-align: right;
         }
 
-        /* --- 2. 数据仪表盘 (Dashboard) --- */
+        /* --- 2. 仪表盘 --- */
         .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
         }
 
         .stat-card {
-            background-color: var(--card-bg);
-            padding: 12px 16px;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            transition: background-color 0.3s;
+            background-color: var(--card-bg); padding: 12px 16px;
+            border-radius: 8px; display: flex; flex-direction: column;
+            gap: 4px; transition: background-color 0.3s;
         }
 
-        .stat-label {
-            font-size: 11px;
-            color: var(--text-sub);
-            font-weight: 600;
-        }
+        .stat-label { font-size: 11px; color: var(--text-sub); font-weight: 600; }
 
         .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            font-variant-numeric: tabular-nums;
+            font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums;
         }
         
-        /* 连胜火焰特效 */
         .streak-fire { display: inline-block; font-size: 18px; margin-left: 4px; }
 
-        /* --- 3. 热力图 (Visual History) --- */
-        .heatmap-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
+        /* --- 3. 热力图 --- */
+        .heatmap-container { display: flex; flex-direction: column; gap: 8px; }
         
         .heatmap-title {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-sub);
-            display: flex;
-            justify-content: space-between;
+            font-size: 11px; font-weight: 600; color: var(--text-sub);
+            display: flex; justify-content: space-between;
         }
 
-        .grid-wrapper {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
+        .grid-wrapper { display: flex; flex-wrap: wrap; gap: 5px; }
 
         .day-square {
-            width: 10px; /* 稍微调小一点，更精致 */
-            height: 10px;
-            background-color: var(--grid-empty);
-            border-radius: 2px;
-            transition: all 0.3s ease;
+            width: 10px; height: 10px; background-color: var(--grid-empty);
+            border-radius: 2px; transition: all 0.3s ease;
         }
 
         .day-square.active {
             background-color: var(--grid-active);
-            box-shadow: 0 0 6px rgba(48, 209, 88, 0.4); /* 荧光 */
+            box-shadow: 0 0 6px rgba(48, 209, 88, 0.4); 
         }
 
         .day-square.today {
-            border: 1px solid var(--text-sub); /* 今日未打卡时的边框提示 */
-            box-sizing: border-box;
+            border: 1px solid var(--text-sub); box-sizing: border-box;
         }
         .day-square.active.today { border: none; }
 
-        /* --- 4. 底部行动区 (Call to Action) --- */
-        .action-area {
-            margin-top: 4px;
-        }
+        /* --- 4. 按钮 (核心修复区域) --- */
+        .action-area { margin-top: 4px; }
 
         .check-in-btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
-            background-color: var(--text-main); /* 反色按钮 */
-            color: var(--bg-color);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
+            width: 100%; padding: 14px; border: none; border-radius: 10px;
+            background-color: var(--text-main); color: var(--bg-color);
+            font-size: 14px; font-weight: 600; cursor: pointer; /* 确保一直是手型指针 */
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+            user-select: none;
         }
 
-        .check-in-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
+        .check-in-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .check-in-btn:active { transform: scale(0.98); }
 
-        .check-in-btn:active {
-            transform: scale(0.98);
-        }
-
+        /* 打卡完成后的样式 */
         .check-in-btn.checked {
-            background-color: var(--card-bg); /* 打卡后变淡 */
-            color: var(--text-sub);
-            cursor: default;
+            background-color: var(--card-bg); 
+            color: var(--success-color); /* 文字变绿 */
+            /* 关键修复：允许点击 */
+            cursor: pointer; 
+        }
+
+        /* 打卡完成后悬停的样式（暗示取消） */
+        .check-in-btn.checked:hover {
+            background-color: #fff1f0; /* 浅红色背景提示 */
+            color: var(--danger-color); /* 文字变红提示 */
+            opacity: 1;
+        }
+        /* 深色模式下的悬停 */
+        body.dark-mode .check-in-btn.checked:hover {
+            background-color: #3a1e1e;
         }
         
         .quote-text {
-            margin-top: 12px;
-            font-size: 11px;
-            color: var(--text-sub);
-            text-align: center;
-            min-height: 14px;
-            opacity: 0.8;
-            transition: opacity 0.5s;
+            margin-top: 12px; font-size: 11px; color: var(--text-sub);
+            text-align: center; min-height: 14px; opacity: 0.8; transition: opacity 0.5s;
         }
 
-        /* 响应式微调 */
         @media (max-width: 300px) {
             .widget-container { padding: 16px; }
             .level-title { font-size: 18px; }
@@ -265,23 +214,15 @@
     </div>
 
     <script>
-        // ==========================================
-        // 1. 主题适配逻辑 (核心：与时间组件完全一致)
-        // ==========================================
+        // 1. 主题适配
         function applyTheme() {
-            // 优先检查 URL 参数
             const urlParams = new URLSearchParams(window.location.search);
             const forceTheme = urlParams.get('theme');
-            
             let isDark = false;
-            if (forceTheme === 'dark') {
-                isDark = true;
-            } else if (forceTheme === 'light') {
-                isDark = false;
-            } else {
-                // 如果没有 URL 参数，使用系统偏好
-                isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            }
+            
+            if (forceTheme === 'dark') isDark = true;
+            else if (forceTheme === 'light') isDark = false;
+            else isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 
             if (isDark) {
                 document.body.classList.add('dark-mode');
@@ -291,19 +232,13 @@
                 document.body.classList.remove('dark-mode');
             }
         }
-
-        // 监听变化
         window.matchMedia('(prefers-color-scheme: dark)').addListener(applyTheme);
         applyTheme();
 
-        // ==========================================
-        // 2. 数据与业务逻辑
-        // ==========================================
+        // 2. 逻辑处理
         const STORAGE_KEY = 'notion_reading_logs';
-        // 显示格子数量 (12周 x 7天 = 84)
         const GRID_COUNT = 84; 
 
-        // 称号系统配置
         const LEVELS = [
             { min: 0, title: "阅读学徒", badge: "LV.1" },
             { min: 7, title: "初级书虫", badge: "LV.2" },
@@ -313,7 +248,6 @@
             { min: 365, title: "知识宗师", badge: "MAX" }
         ];
 
-        // 鼓励语库
         const QUOTES = [
             "阅读是随身携带的避难所。",
             "今日的阅读，是明日的见识。",
@@ -322,7 +256,6 @@
             "又是一个充满知识的一天！"
         ];
 
-        // 工具函数
         const getTodayStr = () => {
             const d = new Date();
             const offset = d.getTimezoneOffset() * 60000;
@@ -338,82 +271,76 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify([...logs]));
         };
 
-        // 计算等级
         const getLevelInfo = (totalDays) => {
-            // 倒序查找满足条件的最高等级
             for (let i = LEVELS.length - 1; i >= 0; i--) {
                 if (totalDays >= LEVELS[i].min) return LEVELS[i];
             }
             return LEVELS[0];
         };
 
-        // 计算连胜
         const calculateStats = (logs) => {
             let streak = 0;
             let checkDate = new Date();
             const todayStr = getTodayStr();
             
-            // 如果今天没打卡，从昨天算起
             if (!logs.has(todayStr)) {
                 checkDate.setDate(checkDate.getDate() - 1);
             }
 
             for (let i = 0; i < 365; i++) {
                 const dateStr = checkDate.toISOString().split('T')[0];
-                // 修正时区
                 const offset = checkDate.getTimezoneOffset() * 60000;
                 const localDate = new Date(checkDate.getTime() - offset).toISOString().split('T')[0];
                 
                 if (logs.has(localDate)) streak++;
                 else break;
-                
                 checkDate.setDate(checkDate.getDate() - 1);
             }
             return { streak, total: logs.size };
         };
 
-        // 交互处理
+        // 关键修复：切换逻辑 (Toggle Logic)
         function handleCheckIn() {
             const logs = getLogs();
             const today = getTodayStr();
+            const btn = document.getElementById('mainBtn');
             
-            if (!logs.has(today)) {
+            if (logs.has(today)) {
+                // 如果已打卡 -> 取消打卡
+                logs.delete(today);
+                saveLogs(logs);
+                // 立即渲染，无需延迟
+                render();
+            } else {
+                // 如果未打卡 -> 执行打卡
                 logs.add(today);
                 saveLogs(logs);
                 
-                // 简单的视觉反馈
-                const btn = document.getElementById('mainBtn');
+                // 视觉反馈
                 btn.innerHTML = "✨ 打卡成功！";
-                setTimeout(render, 600); // 延迟刷新界面
+                setTimeout(render, 600); 
             }
         }
 
-        // ==========================================
-        // 3. 界面渲染
-        // ==========================================
         function render() {
             const logs = getLogs();
             const todayStr = getTodayStr();
             const stats = calculateStats(logs);
             const level = getLevelInfo(stats.total);
 
-            // 1. 更新头部信息
             document.getElementById('levelBadge').textContent = level.badge;
             document.getElementById('levelTitle').textContent = level.title;
             
             const now = new Date();
             document.getElementById('dateStr').textContent = now.toLocaleDateString('zh-CN', {month:'long', day:'numeric', weekday:'short'});
 
-            // 2. 更新数据卡片
             document.getElementById('streakVal').textContent = stats.streak;
             document.getElementById('totalVal').textContent = stats.total;
             
-            // 连胜火焰颜色
             const fire = document.getElementById('fireIcon');
             fire.style.opacity = stats.streak > 0 ? '1' : '0.2';
             fire.style.filter = stats.streak > 3 ? 'drop-shadow(0 0 5px orange)' : 'none';
 
-            // 3. 更新热力图
             const grid = document.getElementById('grid');
             grid.innerHTML = '';
             let activeCountInGrid = 0;
@@ -433,34 +360,35 @@
                     activeCountInGrid++;
                 }
                 
-                // 简单的 Tooltip (title属性)
                 square.title = `${dateStr}: ${logs.has(dateStr) ? "已读" : "未读"}`;
                 grid.appendChild(square);
             }
 
-            // 更新热力图标题旁边的完成率 (近3个月)
             const rate = Math.round((activeCountInGrid / GRID_COUNT) * 100);
             document.getElementById('progressText').textContent = `近况 ${rate}%`;
 
-            // 4. 更新按钮状态
+            // 更新按钮状态
             const btn = document.getElementById('mainBtn');
             const quoteEl = document.getElementById('quoteMsg');
 
             if (logs.has(todayStr)) {
+                // 已打卡状态
                 btn.className = "check-in-btn checked";
+                // 悬停时会通过CSS变红，提示可取消
                 btn.innerHTML = "<span>✅ 今日已完成阅读</span>";
-                btn.onclick = null; // 禁用点击
-                // 随机显示一条鼓励语
+                // 关键修复：不再禁用 onclick
+                // btn.onclick = null; <--- 已删除这行
+                
                 quoteEl.textContent = QUOTES[Math.floor(Math.random() * QUOTES.length)];
             } else {
+                // 未打卡状态
                 btn.className = "check-in-btn";
                 btn.innerHTML = "<span>📚 记录今日阅读</span>";
-                btn.onclick = handleCheckIn;
+                
                 quoteEl.textContent = "保持节奏，别让连胜断了！";
             }
         }
 
-        // 初始化
         render();
     </script>
 </body>
