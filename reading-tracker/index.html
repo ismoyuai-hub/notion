@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notion Reading Tracker</title>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <style>
+        :root {
+            /* Notion 配色系统 */
+            --bg-light: #ffffff;
+            --bg-dark: #191919;
+            --text-main-light: #373530;
+            --text-main-dark: #ffffff;
+            --text-sub-light: #787774;
+            --text-sub-dark: #9b9b9b;
+            
+            /* 打卡格子的颜色 */
+            --square-empty-light: #ebedf0;
+            --square-empty-dark: #2f2f2f;
+            --square-active: #30D158; /* iOS 风格的绿色，护眼且醒目 */
+            
+            /* 按钮颜色 */
+            --btn-bg-light: #f1f1ef;
+            --btn-bg-dark: #2c2c2c;
+            --btn-hover-light: #e1e1e0;
+            --btn-hover-dark: #3f3f3f;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--bg-light);
+            color: var(--text-main-light);
+            transition: background 0.3s, color 0.3s;
+            overflow: hidden; /* 防止滚动条 */
+        }
+
+        body.dark-mode {
+            background-color: var(--bg-dark) !important;
+            color: var(--text-main-dark);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px; /* 限制最大宽度 */
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* --- 顶部统计区域 --- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .stats-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-sub-light);
+            margin-bottom: 4px;
+        }
+        body.dark-mode .label { color: var(--text-sub-dark); }
+
+        .big-number {
+            font-size: 36px;
+            font-weight: 800;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.03em;
+        }
+
+        /* --- 打卡按钮 --- */
+        .action-area {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        button#checkInBtn {
+            background: var(--btn-bg-light);
+            color: var(--text-main-light);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            outline: none;
+        }
+        body.dark-mode button#checkInBtn {
+            background: var(--btn-bg-dark);
+            color: var(--text-main-dark);
+        }
+        button#checkInBtn:hover { transform: translateY(-1px); }
+        body.light-mode button#checkInBtn:hover { background: var(--btn-hover-light); }
+        body.dark-mode button#checkInBtn:hover { background: var(--btn-hover-dark); }
+        
+        button#checkInBtn:active { transform: translateY(1px); opacity: 0.8; }
+
+        button#checkInBtn.checked {
+            background: var(--square-active);
+            color: white;
+        }
+
+        /* --- 热力图网格 --- */
+        .heatmap-grid {
+            display: flex;
+            flex-wrap: wrap; /* 关键：允许换行 */
+            gap: 6px; /* 格子间距 */
+            justify-content: flex-start;
+        }
+
+        .day-square {
+            width: 14px;
+            height: 14px;
+            background-color: var(--square-empty-light);
+            border-radius: 3px;
+            transition: background-color 0.4s ease, transform 0.2s;
+            position: relative;
+        }
+        body.dark-mode .day-square { background-color: var(--square-empty-dark); }
+
+        .day-square.active {
+            background-color: var(--square-active);
+        }
+
+        /* Hover 显示日期 Tooltip */
+        .day-square:hover::after {
+            content: attr(data-date);
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 4px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            white-space: nowrap;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* 今日高亮提示 */
+        .day-square.today:not(.active) {
+            border: 2px solid var(--square-active);
+            box-sizing: border-box;
+            background-color: transparent;
+        }
+    </style>
+</head>
+<body class="light-mode">
+
+    <div class="container">
+        <div class="header">
+            <div class="stats-group">
+                <div class="label">Current Streak</div>
+                <div class="big-number" id="currentStreak">0</div>
+            </div>
+            <div class="stats-group" style="text-align: right;">
+                <div class="label">Total Reads</div>
+                <div class="big-number" id="totalDays">0</div>
+            </div>
+        </div>
+
+        <div class="heatmap-grid" id="heatmap">
+            </div>
+
+        <div class="action-area">
+            <button id="checkInBtn" onclick="toggleToday()">
+                <span id="btnIcon">📖</span> 
+                <span id="btnText">Mark as Read</span>
+            </button>
+            <div class="label" id="todayDate" style="margin:0; opacity: 0.6;">...</div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. 数据存储与配置 ---
+        const STORAGE_KEY = 'notion_reading_logs';
+        // 获取过去 X 天的数据用于显示（例如显示过去12周）
+        const DAYS_TO_SHOW = 84; 
+        
+        // --- 2. 核心逻辑 ---
+
+        // 获取所有打卡记录 (Set 结构)
+        function getLogs() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            return stored ? new Set(JSON.parse(stored)) : new Set();
+        }
+
+        // 保存记录
+        function saveLogs(logsSet) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify([...logsSet]));
+        }
+
+        // 获取格式化的今天日期 YYYY-MM-DD
+        function getTodayStr() {
+            const d = new Date();
+            // 考虑本地时区偏移
+            const offset = d.getTimezoneOffset() * 60000;
+            const localDate = new Date(d.getTime() - offset);
+            return localDate.toISOString().split('T')[0];
+        }
+
+        // 切换今日打卡状态
+        function toggleToday() {
+            const today = getTodayStr();
+            const logs = getLogs();
+            
+            if (logs.has(today)) {
+                logs.delete(today); // 取消打卡
+            } else {
+                logs.add(today); // 打卡
+            }
+            
+            saveLogs(logs);
+            render(); // 重新渲染界面
+        }
+
+        // 计算连续打卡 (Streak)
+        function calculateStats(logs) {
+            const today = new Date();
+            let currentStreak = 0;
+            let checkDate = new Date(today); // 从今天开始倒推
+            
+            // 如果今天没打卡，但昨天打了，streak 应该算昨天的；如果今天打了，算今天的
+            // 简单逻辑：检查今天，然后检查昨天...
+            
+            const todayStr = checkDate.toISOString().split('T')[0];
+            let hasBroken = false;
+            
+            // 检查最近 365 天来计算 streak
+            for (let i = 0; i < 365; i++) {
+                const dateStr = checkDate.toISOString().split('T')[0];
+                if (logs.has(dateStr)) {
+                    currentStreak++;
+                } else {
+                    // 如果是今天且没打卡，不打断streak（因为今天还没结束）
+                    // 只有当遇到没打卡的“过去”日子时，才停止
+                    if (dateStr !== getTodayStr()) {
+                        break;
+                    }
+                }
+                checkDate.setDate(checkDate.getDate() - 1);
+            }
+            
+            return {
+                streak: currentStreak,
+                total: logs.size
+            };
+        }
+
+        // --- 3. 渲染界面 ---
+        function render() {
+            const logs = getLogs();
+            const todayStr = getTodayStr();
+            const stats = calculateStats(logs);
+
+            // 更新文本
+            document.getElementById('currentStreak').textContent = stats.streak;
+            document.getElementById('totalDays').textContent = stats.total;
+            
+            // 更新按钮状态
+            const btn = document.getElementById('checkInBtn');
+            const btnText = document.getElementById('btnText');
+            const btnIcon = document.getElementById('btnIcon');
+            
+            if (logs.has(todayStr)) {
+                btn.classList.add('checked');
+                btnText.textContent = "Completed";
+                btnIcon.textContent = "✅";
+            } else {
+                btn.classList.remove('checked');
+                btnText.textContent = "Mark as Read";
+                btnIcon.textContent = "📖";
+            }
+            
+            // 更新日期显示
+            document.getElementById('todayDate').textContent = new Date().toLocaleDateString('zh-CN', {month:'short', day:'numeric'});
+
+            // 生成热力图
+            const heatmapContainer = document.getElementById('heatmap');
+            heatmapContainer.innerHTML = ''; // 清空
+
+            // 生成过去 DAYS_TO_SHOW 天的数组
+            const dates = [];
+            for (let i = DAYS_TO_SHOW - 1; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                dates.push(d.toISOString().split('T')[0]);
+            }
+
+            dates.forEach(date => {
+                const el = document.createElement('div');
+                el.className = 'day-square';
+                el.dataset.date = date; // 用于 tooltip
+                
+                if (logs.has(date)) {
+                    el.classList.add('active');
+                }
+                if (date === todayStr) {
+                    el.classList.add('today');
+                }
+                
+                heatmapContainer.appendChild(el);
+            });
+        }
+
+        // --- 4. 主题适配 ---
+        function applyTheme() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const forceTheme = urlParams.get('theme');
+            let isDark = false;
+            if (forceTheme === 'dark') isDark = true;
+            else if (forceTheme === 'light') isDark = false;
+            else isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (isDark) {
+                document.body.classList.add('dark-mode');
+                document.body.classList.remove('light-mode');
+            } else {
+                document.body.classList.add('light-mode');
+                document.body.classList.remove('dark-mode');
+            }
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addListener(applyTheme);
+        applyTheme();
+
+        // 初始化
+        render();
+
+    </script>
+</body>
+</html>
